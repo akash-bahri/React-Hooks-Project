@@ -132,7 +132,8 @@ function Calculator() {
             setDisplay(display + "" + value);
         }
         else {
-            if (PrevValue == '+' || PrevValue == '-' || PrevValue == '*' || PrevValue == '/') {
+            //update operator if last key press is operator
+            if (PrevValue == '+' || PrevValue == '-' || PrevValue == '*' || PrevValue == '/'|| PrevValue == '.') {
                 let c = cal.toString();
                 c = c.slice(0, -1);
                 let final = c + "" + value;
@@ -140,14 +141,15 @@ function Calculator() {
                 setCal(final)
             }
 
-            else {
-
+            else if(value!='=') {
+                
                 setDisplay(display + "" + value);
                 setCal(cal + "" + value);
                 perc = false;
             }
         }
-        console.log(cal);
+        console.log("val:"+value);
+        console.log("P:"+PrevValue);
     }
 
     /*Component to create Buttons*/

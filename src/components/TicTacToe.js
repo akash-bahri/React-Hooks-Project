@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 
 function TicTacToe() {
     const [grid, setGrid] = useState(Array(9).fill(null));
@@ -8,7 +9,30 @@ function TicTacToe() {
     const [player2Name, setPlayer2Name] = useState("O");
     const [history, setHistory] = useState([]); // New state for match history
     const [selectedMatch, setSelectedMatch] = useState(null); // State to store the selected match
-    const [selectedMatchGrid, setSelectedMatchGrid] = useState(null); // State to store the selected match grid
+    const [selectedMatchGrid, setSelectedMatchGrid] = useState(null); // State to store the selected match grid    
+    const [timer, setTimer] = useState(10); // State to manage the timer
+
+    useEffect(() => {
+        let intervalId;
+
+        if (!winner && timer > 0) {
+            intervalId = setInterval(() => {
+                setTimer((prevTimer) => prevTimer - 1);
+            }, 1000);
+        }
+
+        return () => clearInterval(intervalId); // Clean up interval on component unmount or when timer is 0
+    }, [timer, winner]);
+
+    useEffect(() => {
+        if (timer === 0 && !winner) {
+            setWinner('Timeout');
+            setHistory([
+                ...history,
+                { winner: 'Timeout', grid },
+            ]);
+        }
+    }, [timer, winner, grid, history]);
 
     const checkWinner = (gridVal) => {
         const winScenarios = [
@@ -34,6 +58,7 @@ function TicTacToe() {
 
     const handleClick = (index) => {
         if (grid[index] === null && !winner) {
+            setTimer(10);
             const newGrid = [...grid];
             newGrid[index] = char;
             setGrid(newGrid);
@@ -48,7 +73,7 @@ function TicTacToe() {
                     { winner: result === 'X' ? player1Name : player2Name, grid: newGrid },
                 ]);
             } else if (newGrid.every((Val) => Val !== null)) {
-               
+
                 setWinner('Draw');
 
                 setHistory([
@@ -89,6 +114,7 @@ function TicTacToe() {
         //setHistory([]);
         setSelectedMatch(null);
         setSelectedMatchGrid(null);
+        setTimer(10);
 
     };
 
@@ -124,6 +150,8 @@ function TicTacToe() {
     return (
         <div className="tictactoe">
             <br />
+            <div className="status">Timer: {timer}</div>
+            <br/>
             <div className="row">
                 {GridButton(0)}
                 {GridButton(1)}
@@ -140,6 +168,7 @@ function TicTacToe() {
                 {GridButton(8)}
             </div>
             <div className="status">{ShowResult()}</div>
+            
             <div className="player-names">
                 Player Names:
                 <input className='playertxt'
@@ -159,20 +188,27 @@ function TicTacToe() {
                 <button className="reset-button" onClick={resetGrid}>Reset grid</button>
             </div>
 
-            <div  id='score'>
-                
+            <div id='score'>
                 <h2>SCORE BOARD</h2>
-                
-                
                 <ol>
-                    {history.map((object, index) => (
-                        <li>
+                    {history.map((object, index) => {
+                        if (object.winner === 'Draw')
+                            return <li>
+                                Draw
+                                <button className='select-match' onClick={() => handleSelectMatch(index)}>➤</button></li>
+                        else if (object.winner === 'Timeout')
+                            return <li>
+                                Timeout
+                                <button className='select-match' onClick={() => handleSelectMatch(index)}>➤</button>
+                            </li>
+                        else
+                        return <li>
                             Winner - {object.winner}
                             <button className='select-match' onClick={() => handleSelectMatch(index)}>➤</button>
                         </li>
-                    ))}
+                    })}
                 </ol>
-                
+
             </div>
         </div>
     );

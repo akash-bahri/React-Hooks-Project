@@ -12,7 +12,7 @@ function App() {
     setActiveButton('CALCULATOR');
   }
 
-  function Ocal() {
+  function TicTac() {
     SetTag(<Tictac />);
     setActiveButton('TIC TAC TOE');
   }
@@ -28,7 +28,7 @@ function App() {
         </button>
         <button
           className={`MainButtons ${activeButton === 'TIC TAC TOE' ? 'active' : ''}`}
-          onClick={Ocal}
+          onClick={TicTac}
         >
           TIC TAC TOE
         </button>
